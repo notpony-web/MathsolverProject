@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Math Solver</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+    input { width: 100%; padding: 10px; font-size: 15px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    button { padding: 10px 20px; font-size: 15px; cursor: pointer; border-radius: 6px; border: none; background: #1a73e8; color: white; }
+    #result { margin-top: 20px; white-space: pre-wrap; background: #f5f5f5; padding: 16px; border-radius: 8px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h2>Math Solver</h2>
+  <input id="question" type="text" placeholder="e.g. Solve 2x + 5 = 13" />
+  <button onclick="solve()">Solve</button>
+  <div id="result"></div>
+
+  <script>
+    const API_KEY = "AIzaSyB68Rngw69tvoO_C0UwE0UrpSdwkzmVCEM"; // ← paste your key here
+
+    async function solve() {
+      const q = document.getElementById("question").value.trim();
+      if (!q) return;
+      document.getElementById("result").textContent = "Solving...";
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: "You are a math tutor. Answer with clear step-by-step working in plain text. End with a final answer.\n\nQuestion: " + q
+              }]
+            }]
+          })
+        }
+      );
+
+      const data = await res.json();
+      document.getElementById("result").textContent =
+        data.candidates?.[0]?.content?.parts?.[0]?.text || "Error — try again.";
+    }
+  </script>
+</body>
+</html>
